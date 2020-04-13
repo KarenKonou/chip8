@@ -49,7 +49,26 @@ CPU::CPU() {
   std::cout << "Done!" << std::endl;
 }
 
-auto CPU::loadProgram() -> void {}
+auto CPU::loadProgram(const char* path) -> int {
+  FILE* file = fopen(path, "rb");
+  if (file == nullptr) {
+    std::cout << "Couldn't load program." << std::endl;
+    return 1;
+  }
+
+  fseek(file, 0, SEEK_END);
+  long bufferSize = ftell(file);
+  rewind(file);
+
+  char* buffer = (char*)malloc(sizeof(char) * bufferSize);
+  fread(buffer, 1, bufferSize, file);
+  for (int i = 0; i < bufferSize; ++i) {
+    memory[i + 512] = buffer[i];
+  }
+  fclose(file);
+  free(buffer);
+  return 0;
+}
 
 auto CPU::cycle() -> void {
   opcode = memory[pc] << 8 | memory[pc + 1];

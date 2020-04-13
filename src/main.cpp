@@ -38,10 +38,15 @@ auto initializeGraphics() -> int {
   return 0;
 }
 
-auto main() -> int {
+auto main(int argc, char* argv[]) -> int {
   initializeGraphics();
 
   std::cout << "Renderer pointer is " << ren << std::endl;
+
+  if (cpu.loadProgram(argv[1]) != 0) {
+    SDL_Quit();
+    return 1;
+  }
 
   SDL_Delay(5000);
   SDL_Quit();

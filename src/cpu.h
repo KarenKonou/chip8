@@ -13,6 +13,6 @@ public:
   unsigned char key[16];
 
   auto cycle() -> void;
-  auto loadProgram() -> void;
+  auto loadProgram(const char* path) -> int;
   CPU();
 };
