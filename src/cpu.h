@@ -1,5 +1,5 @@
 class CPU {
-  public:
+public:
   unsigned short opcode;
   unsigned char memory[4096];
   unsigned char V[16];
@@ -11,7 +11,7 @@ class CPU {
   unsigned short stack[16];
   unsigned short sp;
   unsigned char key[16];
-  
+
   void initialize();
   void cycle();
 };

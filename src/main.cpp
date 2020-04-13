@@ -1,5 +1,5 @@
-#include "cpu.h"
 #include "SDL2/SDL.h"
+#include "cpu.h"
 #include <iostream>
 
 CPU cpu;
@@ -14,15 +14,17 @@ auto initialize_graphics() -> int {
     return 1;
   }
 
-  win = SDL_CreateWindow("Hello World!", 100, 100, window_widght, window_height, SDL_WINDOW_SHOWN);
+  win = SDL_CreateWindow("Hello World!", 100, 100, window_widght, window_height,
+                         SDL_WINDOW_SHOWN);
   if (win == nullptr) {
     std::cout << "SDL_CreateWindow Error: " << SDL_GetError() << std::endl;
     SDL_Quit();
     return 1;
   }
 
-  ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-  if (ren == nullptr){
+  ren = SDL_CreateRenderer(
+      win, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+  if (ren == nullptr) {
     SDL_DestroyWindow(win);
     std::cout << "SDL_CreateRenderer Error: " << SDL_GetError() << std::endl;
     SDL_Quit();
@@ -36,7 +38,7 @@ auto initialize_graphics() -> int {
   return 0;
 }
 
-auto main() -> int { 
+auto main() -> int {
   initialize_graphics();
 
   std::cout << "Renderer pointer is " << ren << std::endl;
