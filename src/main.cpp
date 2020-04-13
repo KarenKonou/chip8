@@ -8,7 +8,7 @@ const int window_height = 320;
 SDL_Window* win;
 SDL_Renderer* ren;
 
-auto initialize_graphics() -> int {
+auto initializeGraphics() -> int {
   if (SDL_Init(SDL_INIT_VIDEO) != 0) {
     std::cout << "SDL_Init Error: " << SDL_GetError() << std::endl;
     return 1;
@@ -39,11 +39,10 @@ auto initialize_graphics() -> int {
 }
 
 auto main() -> int {
-  initialize_graphics();
+  initializeGraphics();
 
   std::cout << "Renderer pointer is " << ren << std::endl;
 
-  cpu.initialize();
   SDL_Delay(5000);
   SDL_Quit();
   return 0;

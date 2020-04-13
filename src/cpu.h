@@ -12,6 +12,7 @@ public:
   unsigned short sp;
   unsigned char key[16];
 
-  void initialize();
-  void cycle();
+  auto cycle() -> void;
+  auto loadProgram() -> void;
+  CPU();
 };
