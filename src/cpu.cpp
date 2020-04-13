@@ -61,6 +61,10 @@ auto CPU::loadProgram(const char* path) -> int {
   rewind(file);
 
   char* buffer = (char*)malloc(sizeof(char) * bufferSize);
+  if (buffer == NULL) {
+    std::cout << "Oh fuck this isn't supposed to happen shit" << std::endl;
+    return 1;
+  }
   fread(buffer, 1, bufferSize, file);
   for (int i = 0; i < bufferSize; ++i) {
     memory[i + 512] = buffer[i];
@@ -73,5 +77,6 @@ auto CPU::loadProgram(const char* path) -> int {
 auto CPU::cycle() -> void {
   opcode = memory[pc] << 8 | memory[pc + 1];
 
-  switch (opcode & 0xF000) {}
+  std::cout << std::hex << opcode << std::endl;
+  pc += 2;
 }

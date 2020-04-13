@@ -48,6 +48,10 @@ auto main(int argc, char* argv[]) -> int {
     return 1;
   }
 
+  for (;;) {
+    cpu.cycle();
+  }
+
   SDL_Delay(5000);
   SDL_Quit();
   return 0;
