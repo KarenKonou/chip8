@@ -1,3 +1,4 @@
 project('chip8', 'cpp')
 src = ['src/main.cpp', 'src/cpu.cpp']
-executable('chip8', src)
+libsdl = dependency('sdl2')
+executable('chip8', src, dependencies: libsdl)
