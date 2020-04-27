@@ -3,8 +3,9 @@
 #include <iostream>
 
 CPU cpu;
-const int window_widght = 640;
-const int window_height = 320;
+const int window_widght = 704;
+const int window_height = 352;
+const float window_scale = 10.0;
 SDL_Window* win;
 SDL_Renderer* ren;
 
@@ -31,7 +32,7 @@ auto initializeGraphics() -> int {
     return 1;
   }
 
-  SDL_RenderSetScale(ren, 9.0, 9.0);
+  SDL_RenderSetScale(ren, window_scale, window_scale);
   SDL_SetRenderDrawColor(ren, 0, 0, 0, 255);
   SDL_RenderClear(ren);
   SDL_RenderPresent(ren);
