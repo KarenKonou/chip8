@@ -14,7 +14,7 @@ auto initializeGraphics() -> int {
     return 1;
   }
 
-  win = SDL_CreateWindow("Hello World!", 100, 100, window_widght, window_height,
+  win = SDL_CreateWindow("Chip8", 100, 100, window_widght, window_height,
                          SDL_WINDOW_SHOWN);
   if (win == nullptr) {
     std::cout << "SDL_CreateWindow Error: " << SDL_GetError() << std::endl;
@@ -31,11 +31,26 @@ auto initializeGraphics() -> int {
     return 1;
   }
 
+  SDL_RenderSetScale(ren, 9.0, 9.0);
   SDL_SetRenderDrawColor(ren, 0, 0, 0, 255);
   SDL_RenderClear(ren);
   SDL_RenderPresent(ren);
 
   return 0;
+}
+
+auto renderFrame() -> void {
+  SDL_SetRenderDrawColor(ren, 0xFF, 0xFF, 0xFF, 0xFF);
+  for (int x = 0; x <= 64; x++) {
+    for (int y = 0; y <= 32; y++) {
+      if (cpu.gfx[(y * 64) + x] == 1) {
+        SDL_RenderDrawPoint(ren, x, y);
+      }
+    }
+  }
+  SDL_RenderPresent(ren);
+  SDL_SetRenderDrawColor(ren, 0x00, 0x00, 0x00, 0xFF);
+  cpu.draw_flag = false;
 }
 
 auto main(int argc, char* argv[]) -> int {
@@ -50,6 +65,9 @@ auto main(int argc, char* argv[]) -> int {
 
   for (;;) {
     cpu.cycle();
+
+    if (cpu.draw_flag)
+      renderFrame();
   }
 
   SDL_Delay(5000);
