@@ -1,4 +1,5 @@
 #include "cpu.h"
+#include <cstdlib>
 #include <iostream>
 
 unsigned char chip8_fontset[80] = {
@@ -75,7 +76,7 @@ auto CPU::loadProgram(const char* path) -> int {
   for (int i = 0; i < bufferSize; ++i) {
     memory[i + 512] = buffer[i];
   }
-  
+
   fclose(file);
   free(buffer);
   return 0;
@@ -96,6 +97,9 @@ auto CPU::cycle() -> void {
       break;
 
     case 0x000E: // 0x00EE: Returns from subroutine
+      --sp;
+      pc = stack[sp] + 2;
+      stack[sp] = 0;
       break;
     }
   case 0x1000: // 0x1NNN: Jumps to address NNN
@@ -103,6 +107,9 @@ auto CPU::cycle() -> void {
     break;
 
   case 0x2000: // 0x2NNN: Calls subroutine at NNN
+    stack[sp] = pc;
+    ++sp;
+    pc = opcode & 0x0FFF;
     break;
 
   case 0x3000: // 0x3XNN: Skips next instruction if VX equals NN
@@ -173,7 +180,7 @@ auto CPU::cycle() -> void {
       pc += 2;
       break;
 
-    case 0x0005: // 0x8XY5: Substract VY from FX (VF zero'd when borrowing)
+    case 0x0005: // 0x8XY5: Substract VY from VX (VF zero'd when borrowing)
       if (V[(opcode & 0x00F0) >> 4] > V[(opcode & 0x0F00) >> 8])
         V[0xF] = 0; // borrow
       else
@@ -181,11 +188,75 @@ auto CPU::cycle() -> void {
       V[(opcode & 0x0F00) >> 8] -= V[(opcode & 0x00F0) >> 4];
       pc += 2;
       break;
+
+    case 0x0006: // 0x8XY6: Stores the least significant bit of VX in VF and
+                 // then shifts VX to the right by 1.
+      V[0xF] = V[(opcode & 0x0F00) >> 8] & 0x01;
+      V[(opcode & 0x0F00) >> 8] >>= 1;
+      pc += 2;
+      break;
+
+    case 0x0007: // 0x8XY7: Sets VX to VY minus VX (VF zero'd when borrowing)
+      if (V[(opcode & 0x0F00) >> 8] > V[(opcode & 0x00F0) >> 4]) // borrow
+        V[0xF] = 0;
+      else
+        V[0xF] = 1;
+      V[(opcode & 0x0F00) >> 8] =
+          V[(opcode & 0x00F0) >> 4] - V[(opcode & 0x0F00) >> 8];
+      pc += 2;
+      break;
+
+    case 0x000E: // 0x8XYE: Stores the most significant bit of VX in VF and then
+                 // shifts VX to the left by 1.
+      V[0xF] = V[(opcode & 0x0F00) >> 8] & 0x80;
+      V[(opcode & 0x0F00) >> 8] <<= 1;
+      pc += 2;
+      break;
     }
+  case 0x9000: // 0x9XY0: Skips the next instruction if VX doesn't equal VY.
+    if (V[(opcode & 0x0F00) >> 8] != V[(opcode & 0x00F0) >> 4])
+      pc += 4;
+    else
+      pc += 2;
+    break;
+
   case 0xA000: // 0xANNN: Set I to N
     I = opcode & 0x0FFF;
     pc += 2;
     break;
+
+  case 0xB000: // 0xBNNN: Jumps to the address NNN plus V0.
+    pc = (opcode & 0x0FFF) + V[0x0];
+    break;
+
+  case 0xC000: // 0xCXNN: Sets VX to & of NN and a random number (0x00 to 0xFF).
+    V[(opcode & 0x0F00) >> 8] = (rand() % 256) & (opcode & 0x00FF);
+    pc += 2;
+    break;
+
+  case 0xD000: // 0xDXYN: Draws a sprite at coordinate (VX, VY) that has a width
+               // of 8 pixels and a height of N pixels.
+  {
+    unsigned int x = V[(opcode & 0x0F00) >> 8];
+    unsigned int y = V[(opcode & 0x00F0) >> 4];
+    unsigned int height = opcode & 0x000F;
+    unsigned int pixel;
+
+    V[0xF] = 0;
+    for (unsigned int yline = 0; yline < height; yline++) {
+      pixel = memory[I + yline];
+      for (int xline = 0; xline < 8; xline++) {
+        if ((pixel & (0x80 >> xline)) != 0) {
+          if (gfx[(x + xline + ((y + yline) * 64))] == 1)
+            V[0xF] = 1;
+          gfx[x + xline + ((y + yline) * 64)] ^= 1;
+        }
+      }
+    }
+
+    draw_flag = true;
+    pc += 2;
+  } break;
 
   default:
     std::cout << "Unrecognised opcode 0x" << std::hex << opcode << std::endl;
