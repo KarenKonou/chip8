@@ -65,13 +65,13 @@ auto main(int argc, char* argv[]) -> int {
   }
 
   for (;;) {
-    cpu.cycle();
-
+    for (int cycles = 0; cycles < 9; cycles ++) // run for 9 cycles before rendering a frame
+      cpu.cycle();                              // at 60 frames per second this will result
+                                                // in a clock rate of 9*60 = 540hz
     if (cpu.draw_flag)
       renderFrame();
   }
 
-  SDL_Delay(5000);
   SDL_Quit();
   return 0;
 }
