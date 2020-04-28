@@ -3,8 +3,8 @@
 #include <iostream>
 
 CPU cpu;
-const int window_widght = 704;
-const int window_height = 352;
+const int window_widght = 640;
+const int window_height = 320;
 const float window_scale = 10.0;
 SDL_Window* win;
 SDL_Renderer* ren;
@@ -41,9 +41,10 @@ auto initializeGraphics() -> int {
 }
 
 auto renderFrame() -> void {
+  SDL_RenderClear(ren);
   SDL_SetRenderDrawColor(ren, 0xFF, 0xFF, 0xFF, 0xFF);
-  for (int x = 0; x <= 64; x++) {
-    for (int y = 0; y <= 32; y++) {
+  for (int x = 0; x < 64; x++) {
+    for (int y = 0; y < 32; y++) {
       if (cpu.gfx[(y * 64) + x] == 1) {
         SDL_RenderDrawPoint(ren, x, y);
       }
@@ -51,7 +52,6 @@ auto renderFrame() -> void {
   }
   SDL_RenderPresent(ren);
   SDL_SetRenderDrawColor(ren, 0x00, 0x00, 0x00, 0xFF);
-  cpu.draw_flag = false;
 }
 
 auto main(int argc, char* argv[]) -> int {
@@ -67,9 +67,7 @@ auto main(int argc, char* argv[]) -> int {
   for (;;) {
     for (int cycles = 0; cycles < 9; cycles ++) // run for 9 cycles before rendering a frame
       cpu.cycle();                              // at 60 frames per second this will result
-                                                // in a clock rate of 9*60 = 540hz
-    if (cpu.draw_flag)
-      renderFrame();
+    renderFrame();                              // in a clock rate of 9*60 = 540hz 
   }
 
   SDL_Quit();

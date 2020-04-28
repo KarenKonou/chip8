@@ -27,7 +27,6 @@ CPU::CPU() {
   opcode = 0;
   I = 0;
   sp = 0;
-  draw_flag = false;
   for (int i = 0; i < 4096; i++) {
     memory[i] = 0;
   }
@@ -92,7 +91,6 @@ auto CPU::cycle() -> void {
       for (int i = 0; i < 64 * 32; i++) {
         gfx[i] = 0;
       }
-      draw_flag = true;
       pc += 2;
       break;
 
@@ -102,6 +100,8 @@ auto CPU::cycle() -> void {
       stack[sp] = 0;
       break;
     }
+    break; 
+
   case 0x1000: // 0x1NNN: Jumps to address NNN
     pc = opcode & 0x0FFF;
     break;
@@ -213,6 +213,8 @@ auto CPU::cycle() -> void {
       pc += 2;
       break;
     }
+    break; 
+
   case 0x9000: // 0x9XY0: Skips the next instruction if VX doesn't equal VY.
     if (V[(opcode & 0x0F00) >> 8] != V[(opcode & 0x00F0) >> 4])
       pc += 4;
@@ -254,7 +256,6 @@ auto CPU::cycle() -> void {
       }
     }
 
-    draw_flag = true;
     pc += 2;
   } break;
 

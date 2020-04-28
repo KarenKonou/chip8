@@ -11,7 +11,6 @@ public:
   unsigned short stack[16];
   unsigned short sp;
   unsigned char key[16];
-  bool draw_flag;
 
   auto cycle() -> void;
   auto loadProgram(const char* path) -> int;
