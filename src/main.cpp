@@ -57,8 +57,6 @@ auto renderFrame() -> void {
 auto main(int argc, char* argv[]) -> int {
   initializeGraphics();
 
-  std::cout << "Renderer pointer is " << ren << std::endl;
-
   if (cpu.loadProgram(argv[1]) != 0) {
     SDL_Quit();
     return 1;
@@ -68,6 +66,12 @@ auto main(int argc, char* argv[]) -> int {
     for (int cycles = 0; cycles < 9; cycles ++) // run for 9 cycles before rendering a frame
       cpu.cycle();                              // at 60 frames per second this will result
     renderFrame();                              // in a clock rate of 9*60 = 540hz 
+
+    // decrement timers after rendering a frame to tick them at 60hz
+    if (cpu.delay_timer != 0)
+      cpu.delay_timer -= 1;
+    if (cpu.sound_timer != 0)
+      cpu.sound_timer -=1;
   }
 
   SDL_Quit();
